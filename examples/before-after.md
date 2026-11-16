@@ -89,6 +89,56 @@ Flavored mode did not force one fixed term per concept. It still cut the marketi
 
 An earlier version of this file added two facts. It said that a normal cache matches requests by exact text. It also said that this cache stores no data outside your stack. The input states neither fact. A rewrite that adds a fact is no longer a rewrite.
 
+### Example E — Word-count check (Dual-Pass Word Budget)
+
+**Before:**
+> Before you restart the service, check that every configuration file in the deployment directory is correct and that no temporary files remain in the folder.
+
+**Violations flagged:**
+- 25 words, over the 20-word instruction cap.
+
+**After (with the Word budget line):**
+> Before you restart the service, check that every configuration file in the deployment directory is correct. Make sure that no temporary files remain in the deployment directory.
+>
+> Word budget: 16, 11 words (cap 20).
+
+Step 4 requires the counts on the Word budget line after the text. A rewrite without the Word budget line is not checked, even when the sentences happen to fit the cap.
+
+### Example F — Tool parameter with identifiers (Agent/Skill Spec mode)
+
+**Before:**
+> This parameter is used to specify the target directory where files will be saved, though it should only be provided when a multi-file skill is being created and must not be combined with raw content.
+
+**Violations flagged:**
+- Passive voice ("is used to specify").
+- Leading pronoun ("This parameter").
+- Buried condition ("though it should only be provided when...").
+- The exact identifiers `` `skill_dir` `` and `` `content` `` are missing; the text says only "the parameter" and "raw content".
+
+**After:**
+> If you create a multi-file skill, specify the target directory path in `skill_dir`. Omit `skill_dir` for single-file skills. Do not combine `skill_dir` with `content`.
+>
+> Word budget: 12, 4, 4 words (cap 20).
+
+Identifier check: the source names `` `skill_dir` `` and `` `content` ``. Both appear in the rewrite, unchanged and in backticks. The condition ("If you create a multi-file skill") opens the first sentence.
+
+### Example G — Marketing-flavored technical prose (STE-flavored mode)
+
+**Before:**
+> Our blazing-fast, seamless integration effortlessly syncs your data across platforms, providing a robust and powerful experience for modern teams.
+
+**Violations flagged:**
+- Marketing adjectives without measurement ("blazing-fast", "seamless", "effortless", "robust", "powerful").
+- One sentence carrying two claims (what it does, what experience it gives).
+- 19 words, within the 25-word descriptive cap, but the adjectives are the violation.
+
+**After:**
+> Our integration synchronizes your data across platforms for teams.
+>
+> Word budget: 9 words (cap 25).
+
+Marketing-flavored technical prose is in scope for STE-flavored mode. The mode removes the adjectives and keeps the facts. Creative writing and client-facing correspondence stay out of scope.
+
 ## How to Read These Examples
 
 Part 1 shows the actual rules this skill is built on. Part 2 shows the transfer: the same discipline — one meaning per word, active voice, simple tense, one instruction per sentence, explicit conditions instead of buried subordinate clauses — makes machine-to-machine and cross-language text safer to parse, not just aircraft manuals.
